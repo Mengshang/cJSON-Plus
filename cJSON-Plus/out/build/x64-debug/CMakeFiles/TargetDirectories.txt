@@ -1,0 +1,3 @@
+E:/Code/Cpp/cJSON-Plus/cJSON-Plus/out/build/x64-debug/CMakeFiles/cJSON-Plus.dir
+E:/Code/Cpp/cJSON-Plus/cJSON-Plus/out/build/x64-debug/CMakeFiles/edit_cache.dir
+E:/Code/Cpp/cJSON-Plus/cJSON-Plus/out/build/x64-debug/CMakeFiles/rebuild_cache.dir

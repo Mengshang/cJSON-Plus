@@ -9,7 +9,7 @@ void log(const char* data) {
 }
 #else
 void log(const char* data) {
-	
+
 }
 #endif // DEBUG
 
@@ -21,7 +21,7 @@ cJSON_Plus::cJSON_Plus()
 }
 
 cJSON_Plus::cJSON_Plus(cJSON* json)
-	: object_(json)
+	: object_(cJSON_Duplicate(json, true))
 {
 	log("cJSON_Plus(cJSON*)");
 }
@@ -78,10 +78,16 @@ void cJSON_Plus::insert(const char* key, const bool& value)
 	cJSON_AddBoolToObject(object_, key, value);
 }
 
-void cJSON_Plus::insert(const char* key, cJSON_Plus& value)
+void cJSON_Plus::insert(const char* key, const std::nullptr_t&& value)
 {
-	value.parent_ = this;
-	cJSON_AddItemToObject(object_, key, value.object_);
+	cJSON_AddNullToObject(object_, key);
+}
+
+void cJSON_Plus::insert(const char* key, cJSON_Plus& value, bool copy_flag)
+{
+	value.parent_ = copy_flag ? nullptr : this;
+	cJSON_AddItemToObject(object_, key,
+		copy_flag ? cJSON_Duplicate(value.object_, true) : value.object_);
 }
 
 const cJSON_Plus cJSON_Plus::get(const char* key) const
@@ -125,6 +131,30 @@ void cJSON_Plus::replace(const char* key, cJSON_Plus& value)
 	cJSON_ReplaceItemInObject(object_, key, value.object_);
 }
 
+void cJSON_Plus::remove(const char* key)
+{
+	cJSON_DeleteItemFromObject(object_, key);
+}
+
+void cJSON_Plus::swap(cJSON_Plus& other)
+{
+	auto temp = std::move(object_);
+	object_ = other.object_;
+	other.object_ = temp;
+	std::swap(parent_, other.parent_);
+}
+
+cJSON_Plus cJSON_Plus::fromCommonText(const char* json)
+{
+	return cJSON_Plus(cJSON_Parse(json));
+}
+
+cJSON_Plus cJSON_Plus::fromCommonText(const std::string& json)
+{
+	return cJSON_Plus(cJSON_Parse(json.c_str()));
+}
+
+
 const char* cJSON_Plus::toString() const
 {
 	return cJSON_Print(object_);
@@ -133,12 +163,6 @@ const char* cJSON_Plus::toString() const
 std::string cJSON_Plus::toStdString() const
 {
 	return std::string(cJSON_Print(object_));
-}
-
-cJSON_Plus& cJSON_Plus::operator=(int& value)
-{
-	object_->valuedouble = static_cast<double>(value);
-	return *this;
 }
 
 cJSON_Plus& cJSON_Plus::operator=(const float& value)
@@ -162,6 +186,7 @@ cJSON_Plus& cJSON_Plus::operator=(const bool& value)
 cJSON_Plus& cJSON_Plus::operator=(cJSON_Plus& value)
 {
 	object_ = value.object_;
+	parent_ = value.parent_;
 	return *this;
 }
 
@@ -182,6 +207,12 @@ cJSON_Plus& cJSON_Plus::operator=(const char* value)
 cJSON_Plus& cJSON_Plus::operator=(const std::string& value)
 {
 	object_->valuestring = const_cast<char*>(value.c_str());
+	return *this;
+}
+
+cJSON_Plus& cJSON_Plus::operator=(const int& value)
+{
+	object_->valuedouble = static_cast<double>(value);
 	return *this;
 }
 

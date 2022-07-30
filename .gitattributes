@@ -1,4 +1,4 @@
 *.c linguist-language=C++
 *.cpp linguist-language=C++
-*.txt linguist-language=C++
+CMakeLists.txt linguist-language=C++
 *.h linguist-language=C++

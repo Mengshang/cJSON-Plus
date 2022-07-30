@@ -1,4 +1,5 @@
 *.c linguist-language=C++
 *.cpp linguist-language=C++
-CMakeLists.txt linguist-language=C++
 *.h linguist-language=C++
+CMakeLists.txt linguist-language=C++
+CMakePresets.json linguist-language=C++
